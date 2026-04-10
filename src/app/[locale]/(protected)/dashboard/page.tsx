@@ -6,6 +6,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { motion } from "motion/react";
+import { useState } from "react";
+import { EmotionLogModal } from "@/components/dashboard/EmotionLogModal";
 
 const moodData = [
   { name: "Calm", value: 65, color: "#a78bfa" },
@@ -31,6 +33,7 @@ const weeklyTrendData = [
 ];
 
 export default function DashboardPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Animated gradient background */}
@@ -101,6 +104,7 @@ export default function DashboardPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setIsModalOpen(true)}
                 className="px-6 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/30 font-medium"
               >
                 Log emotion
@@ -271,6 +275,7 @@ export default function DashboardPage() {
           </motion.div>
         </div>
       </main>
+      <EmotionLogModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

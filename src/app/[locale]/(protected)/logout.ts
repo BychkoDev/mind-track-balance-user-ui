@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN, ROLE } from "@/utils/cookiesName";
+import { JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN, ROLE, DEVICE_ID } from "@/utils/cookiesName";
 import { redirect } from "next/navigation";
 import { env } from "@/env";
 import { getJwtAccessToken } from "./auth/token";
@@ -19,5 +19,6 @@ export async function logout() {
   cookieStore.delete(JWT_ACCESS_TOKEN);
   cookieStore.delete(JWT_REFRESH_TOKEN);
   cookieStore.delete(ROLE);
+  cookieStore.delete(DEVICE_ID);
   redirect("/login");
 }

@@ -79,7 +79,6 @@ export default function LoginPage() {
       }
 
       if(res.ok) {
-        console.log("RES OK: !!!!!!!!!!!!!" + JSON.stringify(res.ok));
         setUser(res.ok);
         router.push("/dashboard");
         return;
