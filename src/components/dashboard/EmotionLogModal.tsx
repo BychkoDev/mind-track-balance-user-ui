@@ -1,20 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { env } from "@/env";
 
-const emotions = [
-  { id: "tired", icon: "😮‍💨", label: "Tired", color: "#f87171", score: 2 },
-  { id: "focused", icon: "🎯", label: "Focused", color: "#fb923c", score: 4 },
-  { id: "calm", icon: "😌", label: "Calm", color: "#facc15", score: 6 },
-  { id: "relaxed", icon: "🧘", label: "Relaxed", color: "#a3e635", score: 8 },
-  { id: "happy", icon: "😆", label: "Happy", color: "#22c55e", score: 10 },
-];
-
-const quickTags = ["Work", "Study", "Fatigue", "Rest", "Social", "Exercise"];
+const metricKeys = ["mood", "stressLevel", "energy", "anxiety", "focus", "recoveryFeeling"] as const;
+const contextKeys = ["work", "study", "fatigue", "rest", "social", "exercise"] as const;
 
 interface EmotionLogModalProps {
   isOpen: boolean;
@@ -22,29 +16,45 @@ interface EmotionLogModalProps {
 }
 
 export function EmotionLogModal({ isOpen, onClose }: EmotionLogModalProps) {
-  const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [reflection, setReflection] = useState("");
+  const t = useTranslations("EmotionModal");
+  const [metricValues, setMetricValues] = useState<Record<string, number>>({});
+  const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
+  const [description, setDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [showLowValueWarning, setShowLowValueWarning] = useState(false);
+  const [attemptedSave, setAttemptedSave] = useState(false);
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+  const setMetricValue = (metricId: string, value: number) => {
+    setMetricValues((prev) => ({ ...prev, [metricId]: value }));
+  };
+
+  const toggleContext = (context: string) => {
+    setSelectedContexts((prev) =>
+      prev.includes(context) ? prev.filter((c) => c !== context) : [...prev, context]
     );
   };
 
-  const handleSave = async () => {
-    if (!selectedEmotion) return;
+  const handleSave = async (forceSave = false) => {
+    setAttemptedSave(true);
+    
+    const allMetricsFilled = metricKeys.every(key => metricValues[key] !== undefined);
+    
+    if (!allMetricsFilled) {
+      toast.error(t("confirmTitle"), { description: "Please provide all 6 metrics highlighted in red." });
+      return;
+    }
 
-    const mood = emotions.find((e) => e.id === selectedEmotion);
-    if (!mood) return;
+    const lowValuesCount = metricKeys.filter(key => metricValues[key] === 1).length;
+    if (lowValuesCount >= 4 && !forceSave && !showLowValueWarning) {
+      setShowLowValueWarning(true);
+      return;
+    }
 
     setIsSaving(true);
-
+    // ... rest of saving logic
     try {
       const BACK_SERVER_URL = env.NEXT_PUBLIC_SERVER_URL || "http://localhost:4090";
       
-      // Get the current access token from cookies
       const getCookie = (name: string) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -60,28 +70,36 @@ export function EmotionLogModal({ isOpen, onClose }: EmotionLogModalProps) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          moodScore: mood.score,
-          text: reflection || undefined,
-          tags: selectedTags.length > 0 ? selectedTags : undefined,
+          mood: metricValues.mood,
+          stressLevel: metricValues.stressLevel,
+          energy: metricValues.energy,
+          anxiety: metricValues.anxiety,
+          focus: metricValues.focus,
+          recoveryFeeling: metricValues.recoveryFeeling,
+          contexts: selectedContexts.length > 0 ? selectedContexts : undefined,
+          description: description || undefined,
         }),
       });
 
       if (!response.ok) throw new Error("Failed to save entry");
 
-      toast.success("Mood captured successfully! ✨");
+      toast.success("Entry saved successfully! ✨");
       
-      // Reset and close
-      setSelectedEmotion(null);
-      setSelectedTags([]);
-      setReflection("");
+      setMetricValues({});
+      setSelectedContexts([]);
+      setDescription("");
+      setShowLowValueWarning(false);
+      setAttemptedSave(false);
       onClose();
     } catch (error) {
       console.error("Save error:", error);
-      toast.error("Failed to save your mood. Please try again.");
+      toast.error("Failed to save. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
+
+  const hasAnyMetric = Object.keys(metricValues).length > 0;
 
   return (
     <AnimatePresence>
@@ -92,149 +110,229 @@ export function EmotionLogModal({ isOpen, onClose }: EmotionLogModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/30 backdrop-blur-md z-[100]"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
           />
 
-          <div className="fixed inset-0 flex items-center justify-center z-[101] p-4 pointer-events-none">
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-3xl bg-white/60 backdrop-blur-2xl border border-white/40 shadow-2xl p-8 pointer-events-auto relative"
+              className="w-full max-w-lg rounded-3xl bg-white/50 backdrop-blur-xl border border-white/30 shadow-2xl p-8 pointer-events-auto relative max-h-[95vh] overflow-y-auto"
               style={{
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(243, 232, 255, 0.7) 100%)",
+                background: "linear-gradient(135deg, rgba(243, 232, 255, 0.6) 0%, rgba(209, 250, 229, 0.6) 100%)",
               }}
             >
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all flex items-center justify-center shadow-sm"
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/60 backdrop-blur-sm hover:bg-white transition-colors flex items-center justify-center shadow-sm"
               >
-                <X className="w-5 h-5 text-gray-400" />
+                <X className="w-4 h-4 text-gray-600" />
               </button>
 
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-1">My Day</h2>
-                <p className="text-gray-500 text-sm">How are you feeling right now?</p>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-1">{t("title")}</h2>
+                <p className="text-gray-600 text-sm">{t("subtitle")}</p>
               </div>
 
-              {/* Emotion Grid */}
-              <div className="mb-8">
-                <div className="flex justify-between items-end gap-3">
-                  {emotions.map((emotion, index) => {
-                    const isSelected = selectedEmotion === emotion.id;
-                    return (
-                      <div key={emotion.id} className="flex-1 flex flex-col items-center gap-3">
-                        <motion.button
-                          onClick={() => setSelectedEmotion(emotion.id)}
-                          whileHover={{ scale: 1.1, y: -5 }}
-                          whileTap={{ scale: 0.9 }}
-                          className={`w-full aspect-square rounded-3xl flex items-center justify-center text-3xl transition-all shadow-sm ${
-                            isSelected 
-                              ? "bg-white border-white scale-110 shadow-xl z-10" 
-                              : "bg-white/40 border-transparent hover:bg-white/60"
-                          } border-2`}
-                          style={isSelected ? { borderColor: `${emotion.color}40` } : {}}
-                        >
-                          {emotion.icon}
-                        </motion.button>
-                        
-                        {/* LED Level Scale */}
-                        <div className="flex gap-[2px] w-full px-1">
-                          {[...Array(5)].map((_, i) => (
-                            <div
-                              key={i}
-                              className="h-1.5 flex-1 rounded-full transition-all duration-300"
-                              style={{
-                                backgroundColor: isSelected || (selectedEmotion === null && index * 2 >= i * 2)
-                                  ? emotion.color 
-                                  : `${emotion.color}20`,
-                                opacity: isSelected ? 1 : 0.3,
-                                boxShadow: isSelected ? `0 0 8px ${emotion.color}` : "none"
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <span className={`text-[10px] font-bold ${isSelected ? "text-gray-800" : "text-gray-400"}`}>
-                          {emotion.label}
-                        </span>
-                      </div>
-                    );
-                  })}
+              {/* Metrics Grid */}
+              <div className="mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
+                  {metricKeys.map((metricId) => (
+                    <MetricControl
+                      key={metricId}
+                      metricId={metricId}
+                      label={t(`metrics.${metricId}`)}
+                      value={metricValues[metricId]}
+                      onChange={(value) => setMetricValue(metricId, value)}
+                      isInvalid={attemptedSave && metricValues[metricId] === undefined}
+                    />
+                  ))}
                 </div>
               </div>
+              
+              {/* rest of components... */}
+              <AnimatePresence>
+                {showLowValueWarning && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex gap-3 overflow-hidden"
+                  >
+                    <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-amber-900 mb-1">{t("confirmTitle")}</p>
+                      <p className="text-xs text-amber-800 mb-3">{t("confirmLowValues")}</p>
+                      <button
+                        onClick={() => handleSave(true)}
+                        className="text-xs font-bold text-amber-900 underline"
+                      >
+                        {t("confirmAction")}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Context Tags */}
-              <div className="mb-6">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block px-1">
-                  Context (optional)
+              <div className="mb-5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block px-1">
+                  {t("contextLabel")}
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {quickTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        selectedTags.includes(tag)
-                          ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30"
-                          : "bg-white/60 text-gray-600 hover:bg-white"
+                  {contextKeys.map((context) => (
+                    <motion.button
+                      key={context}
+                      onClick={() => toggleContext(context)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        selectedContexts.includes(context)
+                          ? "bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25"
+                          : "bg-white/60 text-gray-700 hover:bg-white/80"
                       }`}
                     >
-                      {tag}
-                    </button>
+                      {t(`contexts.${context}`)}
+                    </motion.button>
                   ))}
                 </div>
               </div>
 
               {/* Reflection */}
-              <div className="mb-8">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block px-1">
-                  Reflection (optional)
+              <div className="mb-6">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block px-1">
+                  {t("reflectionLabel")}
                 </label>
                 <textarea
-                  value={reflection}
-                  onChange={(e) => setReflection(e.target.value.slice(0, 140))}
-                  placeholder="What's on your mind?"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value.slice(0, 140))}
+                  placeholder={t("placeholder")}
+                  maxLength={140}
                   rows={3}
-                  className="w-full rounded-3xl bg-white/60 border border-white/20 p-4 text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-500/10 transition-all resize-none shadow-sm"
+                  className="w-full rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 px-4 py-3 text-gray-700 placeholder:text-gray-400 resize-none focus:outline-none focus:ring-4 focus:ring-purple-500/10 transition-all shadow-sm"
+                  style={{ boxShadow: "inset 0 2px 8px rgba(0, 0, 0, 0.02)" }}
                 />
-                <div className="flex justify-end mt-2 px-2">
-                  <span className={`text-[10px] font-bold ${reflection.length >= 130 ? "text-red-400" : "text-gray-400"}`}>
-                    {reflection.length}/140
-                  </span>
+                <div className="text-[10px] font-bold text-gray-400 mt-2 text-right px-1">
+                  {description.length}/140
                 </div>
               </div>
 
-              {/* Submit */}
+              {/* Save Button */}
               <motion.button
-                onClick={handleSave}
-                disabled={!selectedEmotion || isSaving}
-                whileHover={selectedEmotion ? { scale: 1.02, y: -2 } : {}}
-                whileTap={selectedEmotion ? { scale: 0.98 } : {}}
-                className={`w-full py-4 rounded-3xl font-bold text-white transition-all shadow-xl ${
-                  selectedEmotion 
-                    ? "bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 shadow-purple-500/25 hover:shadow-purple-500/40" 
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
+                onClick={() => handleSave()}
+                disabled={isSaving}
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.99 }}
+                className={`w-full py-4 rounded-2xl text-white font-bold transition-all shadow-xl bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 shadow-purple-500/25 hover:shadow-purple-500/40`}
               >
-                {isSaving ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Saving...
-                  </div>
-                ) : "Save"}
+                {isSaving ? "..." : t("save")}
               </motion.button>
 
-              <div className="mt-6 flex items-center justify-center gap-2 text-gray-400">
-                <span className="text-[10px] font-bold tracking-widest uppercase italic">
-                  🔒 Private & Secure
-                </span>
-              </div>
+              <p className="text-[10px] font-bold text-gray-400 text-center mt-4 tracking-widest uppercase italic">
+                🔒 {t("privacy")}
+              </p>
             </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+function MetricControl({
+  metricId,
+  label,
+  value,
+  onChange,
+  isInvalid,
+}: {
+  metricId: string;
+  label: string;
+  value?: number;
+  onChange: (value: number) => void;
+  isInvalid?: boolean;
+}) {
+  const t = useTranslations("EmotionModal.labels");
+  const levels = [1, 2, 3, 4, 5];
+
+  const getMinLabel = () => {
+    switch(metricId) {
+      case 'mood': return t('low');
+      case 'stressLevel': return t('calm');
+      case 'energy': return t('drained');
+      case 'anxiety': return t('none');
+      case 'focus': return t('scattered');
+      case 'recoveryFeeling': return t('poor');
+      default: return "";
+    }
+  };
+
+  const getMaxLabel = () => {
+    switch(metricId) {
+      case 'mood': return t('high');
+      case 'stressLevel': return t('high');
+      case 'energy': return t('energized');
+      case 'anxiety': return t('high');
+      case 'focus': return t('sharp');
+      case 'recoveryFeeling': return t('great');
+      default: return "";
+    }
+  };
+
+  return (
+    <div className={`space-y-3 p-2 rounded-2xl transition-all ${isInvalid ? 'bg-red-500/5 ring-1 ring-red-500/20' : ''}`}>
+      <div className="flex justify-between items-center px-1">
+        <label className={`text-xs font-bold transition-colors ${isInvalid ? 'text-red-600' : 'text-gray-700'}`}>
+          {label}
+        </label>
+        {isInvalid && (
+           <motion.span 
+             initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }}
+             className="text-[10px] font-bold text-red-500 uppercase italic"
+           >
+             Required
+           </motion.span>
+        )}
+      </div>
+
+      <div className="relative pt-1 pb-5 h-6 flex items-center justify-between px-2">
+         {levels.map((level) => (
+            <motion.button
+              key={level}
+              onClick={() => onChange(level)}
+              whileHover={{ scale: 1.25 }}
+              whileTap={{ scale: 0.85 }}
+              className={`w-7 h-7 rounded-full transition-all flex items-center justify-center relative z-10 ${
+                value === level
+                  ? "bg-gradient-to-br from-purple-500 to-cyan-500 shadow-lg shadow-purple-500/40 ring-2 ring-white/50"
+                  : value && value >= level
+                  ? "bg-gradient-to-br from-purple-400/50 to-cyan-400/50"
+                  : "bg-white/80 hover:bg-white border border-white/50 shadow-sm"
+              }`}
+            >
+              {value === level && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="w-2 h-2 rounded-full bg-white shadow-sm"
+                />
+              )}
+            </motion.button>
+          ))}
+          
+          {/* Labels underneath */}
+          <div className="absolute top-8 left-0 right-0 flex justify-between px-1 pointer-events-none">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter w-20 text-left leading-none">
+              {getMinLabel()}
+            </span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter w-20 text-right leading-none">
+              {getMaxLabel()}
+            </span>
+          </div>
+      </div>
+    </div>
   );
 }

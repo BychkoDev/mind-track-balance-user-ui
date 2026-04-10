@@ -121,5 +121,66 @@
     "signInWithGoogle": "Увійти через Google",
     "signingIn": "Вхід...",
     "creatingAccount": "Створення..."
+  },
+  "Dashboard": {
+    "welcome": "Ласкаво просимо, {name}",
+    "mindfulJourney": "Ваша усвідомлена подорож сьогодні",
+    "todayMood": "Огляд дня",
+    "moodDescription": "Ви зберігали фокус протягом 2г 15хв сьогодні",
+    "logEmotion": "Записати стан",
+    "mindfulPause": "Усвідомлена пауза",
+    "pauseDescription": "Зробіть 5-секундну паузу перед відкриттям соцмереж. Дихайте та встановіть намір.",
+    "pauseNow": "Пауза зараз",
+    "attentionInsights": "Аналітика уваги",
+    "weeklyTrends": "Тижневі тренди",
+    "balanceImproved": "Ваш баланс покращився на",
+    "thisWeek": "цього тижня",
+    "quickActions": "Швидкі дії",
+    "actions": {
+      "reflect": "Рефлексія",
+      "startSession": "Почати сесію",
+      "viewReport": "Звіт",
+      "community": "Спільнота"
+    }
+  },
+  "EmotionModal": {
+    "title": "Мій день",
+    "subtitle": "Як ви почуваєтесь зараз?",
+    "metrics": {
+      "mood": "Настрій",
+      "stressLevel": "Рівень стресу",
+      "energy": "Енергія",
+      "anxiety": "Тривожність",
+      "focus": "Фокус",
+      "recoveryFeeling": "Відчуття відновлення"
+    },
+    "labels": {
+      "low": "Низький",
+      "high": "Високий",
+      "calm": "Спокій",
+      "drained": "Виснажений",
+      "energized": "Енергійний",
+      "none": "Відсутня",
+      "scattered": "Розсіяний",
+      "sharp": "Чіткий",
+      "poor": "Погане",
+      "great": "Чудове"
+    },
+    "contexts": {
+      "work": "Робота",
+      "study": "Навчання",
+      "fatigue": "Втома",
+      "rest": "Відпочинок",
+      "social": "Спілкування",
+      "exercise": "Спорт"
+    },
+    "contextLabel": "Контекст (опціонально)",
+    "reflectionLabel": "Рефлексія (опціонально)",
+    "placeholder": "Що у вас на думці?",
+    "save": "Зберегти",
+    "privacy": "Ваша рефлексія приватна та захищена.",
+    "confirmTitle": "Ви впевнені?",
+    "confirmLowValues": "Ви залишили метрики на найнижчому рівні. Це відображає ваш реальний стан зараз?",
+    "confirmAction": "Так, зберегти"
   }
 }

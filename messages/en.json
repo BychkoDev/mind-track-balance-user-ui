@@ -121,5 +121,66 @@
     "signInWithGoogle": "Sign in with Google",
     "signingIn": "Signing in...",
     "creatingAccount": "Creating account..."
+  },
+  "Dashboard": {
+    "welcome": "Welcome back, {name}",
+    "mindfulJourney": "Here's your mindful journey today",
+    "todayMood": "Today's Mood",
+    "moodDescription": "You've maintained focus for 2h 15m today",
+    "logEmotion": "Log emotion",
+    "mindfulPause": "Mindful Pause",
+    "pauseDescription": "Take a 5-second pause before opening social apps. Breathe and set your intention.",
+    "pauseNow": "Pause Now",
+    "attentionInsights": "Attention Insights",
+    "weeklyTrends": "Weekly Trends",
+    "balanceImproved": "Your balance improved by",
+    "thisWeek": "this week",
+    "quickActions": "Quick Actions",
+    "actions": {
+      "reflect": "Reflect",
+      "startSession": "Start Session",
+      "viewReport": "View Report",
+      "community": "Community"
+    }
+  },
+  "EmotionModal": {
+    "title": "My Day",
+    "subtitle": "How are you feeling right now?",
+    "metrics": {
+      "mood": "Mood",
+      "stressLevel": "Stress level",
+      "energy": "Energy",
+      "anxiety": "Anxiety",
+      "focus": "Focus",
+      "recoveryFeeling": "Recovery feeling"
+    },
+    "labels": {
+      "low": "Low",
+      "high": "High",
+      "calm": "Calm",
+      "drained": "Drained",
+      "energized": "Energized",
+      "none": "None",
+      "scattered": "Scattered",
+      "sharp": "Sharp",
+      "poor": "Poor",
+      "great": "Great"
+    },
+    "contexts": {
+      "work": "Work",
+      "study": "Study",
+      "fatigue": "Fatigue",
+      "rest": "Rest",
+      "social": "Social",
+      "exercise": "Exercise"
+    },
+    "contextLabel": "Context (optional)",
+    "reflectionLabel": "Reflection (optional)",
+    "placeholder": "What's on your mind?",
+    "save": "Save",
+    "privacy": "Your reflection is private and secure.",
+    "confirmTitle": "Are you sure?",
+    "confirmLowValues": "You left metrics at the lowest level. Does this reflect your real state right now?",
+    "confirmAction": "Yes, save"
   }
 }

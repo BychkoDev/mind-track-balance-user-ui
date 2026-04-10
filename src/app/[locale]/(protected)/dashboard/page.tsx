@@ -1,39 +1,40 @@
 "use client";
 
-import { Heart, Brain, TrendingUp, Pause, FileText, Play, Users, Settings, LogOut, User } from "lucide-react";
-import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Heart, Brain, TrendingUp, Pause, FileText, Play, Users } from "lucide-react";
+import { BarChart, Bar, AreaChart, Area, XAxis, ResponsiveContainer, Cell } from "recharts";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { EmotionLogModal } from "@/components/dashboard/EmotionLogModal";
-
-const moodData = [
-  { name: "Calm", value: 65, color: "#a78bfa" },
-  { name: "Focused", value: 85, color: "#60a5fa" },
-  { name: "Distracted", value: 30, color: "#f9a8d4" },
-];
-
-const attentionData = [
-  { name: "Work", hours: 4, icon: "💼", color: "#60a5fa" },
-  { name: "Study", hours: 1.5, icon: "📚", color: "#a78bfa" },
-  { name: "Social", hours: 2, icon: "💬", color: "#f9a8d4" },
-  { name: "Rest", hours: 1, icon: "🌿", color: "#6ee7b7" },
-];
-
-const weeklyTrendData = [
-  { day: "Mon", balance: 60 },
-  { day: "Tue", balance: 65 },
-  { day: "Wed", balance: 58 },
-  { day: "Thu", balance: 72 },
-  { day: "Fri", balance: 78 },
-  { day: "Sat", balance: 82 },
-  { day: "Sun", balance: 75 },
-];
+import { useTranslations } from "next-intl";
 
 export default function DashboardPage() {
+  const t = useTranslations("Dashboard");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const moodData = [
+    { name: t("actions.reflect"), value: 65, color: "#a78bfa" },
+    { name: t("actions.community"), value: 85, color: "#60a5fa" },
+    { name: t("actions.viewReport"), value: 30, color: "#f9a8d4" },
+  ];
+
+  const attentionData = [
+    { name: t("actions.reflect"), hours: 4, icon: "💼", color: "#60a5fa" },
+    { name: t("actions.startSession"), hours: 1.5, icon: "📚", color: "#a78bfa" },
+    { name: t("actions.community"), hours: 2, icon: "💬", color: "#f9a8d4" },
+    { name: t("actions.viewReport"), hours: 1, icon: "🌿", color: "#6ee7b7" },
+  ];
+
+  const weeklyTrendData = [
+    { day: "Mon", balance: 60 },
+    { day: "Tue", balance: 65 },
+    { day: "Wed", balance: 58 },
+    { day: "Thu", balance: 72 },
+    { day: "Fri", balance: 78 },
+    { day: "Sat", balance: 82 },
+    { day: "Sun", balance: 75 },
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Animated gradient background */}
@@ -57,8 +58,10 @@ export default function DashboardPage() {
       {/* Main content */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-gray-800 dark:text-gray-100 mb-2 font-bold text-3xl">Welcome back, Jordan</h1>
-          <p className="text-gray-600 dark:text-gray-400">Here's your mindful journey today</p>
+          <h1 className="text-gray-800 dark:text-gray-100 mb-2 font-bold text-3xl">
+            {t("welcome", { name: "Jordan" })}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">{t("mindfulJourney")}</p>
         </div>
 
         {/* Dashboard Grid */}
@@ -74,12 +77,12 @@ export default function DashboardPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-gray-800 font-semibold text-xl">Today's Mood</h2>
+              <h2 className="text-gray-800 font-semibold text-xl">{t("todayMood")}</h2>
             </div>
 
             <div className="space-y-4 mb-6">
               {moodData.map((mood, index) => (
-                <div key={mood.name} className="space-y-2">
+                <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between text-sm font-medium">
                     <span className="text-gray-700">{mood.name}</span>
                     <span className="text-gray-600">{mood.value}%</span>
@@ -100,14 +103,14 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <p className="text-gray-600 text-sm font-medium">You've maintained focus for 2h 15m today</p>
+              <p className="text-gray-600 text-sm font-medium">{t("moodDescription")}</p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsModalOpen(true)}
                 className="px-6 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/30 font-medium"
               >
-                Log emotion
+                {t("logEmotion")}
               </motion.button>
             </div>
           </motion.div>
@@ -123,11 +126,11 @@ export default function DashboardPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center">
                 <Pause className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-gray-800 font-semibold text-lg">Mindful Pause</h3>
+              <h3 className="text-gray-800 font-semibold text-lg">{t("mindfulPause")}</h3>
             </div>
 
             <p className="text-gray-700 text-sm mb-6 flex-1">
-              Take a 5-second pause before opening social apps. Breathe and set your intention.
+              {t("pauseDescription")}
             </p>
 
             <motion.button
@@ -147,7 +150,7 @@ export default function DashboardPage() {
                 ease: "easeInOut",
               }}
             >
-              Pause Now
+              {t("pauseNow")}
             </motion.button>
           </motion.div>
 
@@ -162,13 +165,13 @@ export default function DashboardPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
                 <Brain className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-gray-800 font-semibold text-xl">Attention Insights</h2>
+              <h2 className="text-gray-800 font-semibold text-xl">{t("attentionInsights")}</h2>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {attentionData.map((item, index) => (
                 <motion.div
-                  key={item.name}
+                  key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
@@ -207,7 +210,7 @@ export default function DashboardPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-gray-800 font-semibold text-xl">Weekly Trends</h2>
+              <h2 className="text-gray-800 font-semibold text-xl">{t("weeklyTrends")}</h2>
             </div>
 
             <div className="h-40 mb-4">
@@ -232,9 +235,9 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-center p-4 rounded-2xl bg-gradient-to-r from-purple-100/50 to-cyan-100/50">
-              <p className="text-sm text-gray-700 font-medium">Your balance improved by</p>
+              <p className="text-sm text-gray-700 font-medium">{t("balanceImproved")}</p>
               <p className="text-2xl text-purple-600 font-bold mt-1">+12%</p>
-              <p className="text-xs text-gray-600 mt-1">this week</p>
+              <p className="text-xs text-gray-600 mt-1">{t("thisWeek")}</p>
             </div>
           </motion.div>
 
@@ -245,29 +248,29 @@ export default function DashboardPage() {
              transition={{ duration: 0.5, delay: 0.4 }}
              className="md:col-span-2 lg:col-span-3 rounded-3xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-xl p-6"
           >
-            <h2 className="text-gray-800 mb-6 font-semibold text-xl">Quick Actions</h2>
+            <h2 className="text-gray-800 mb-6 font-semibold text-xl">{t("quickActions")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <QuickActionCard
                 icon={<FileText className="w-6 h-6" />}
-                label="Reflect"
+                label={t("actions.reflect")}
                 gradient="from-purple-400 to-pink-400"
                 delay={0.5}
               />
               <QuickActionCard
                 icon={<Play className="w-6 h-6" />}
-                label="Start Session"
+                label={t("actions.startSession")}
                 gradient="from-blue-400 to-cyan-400"
                 delay={0.55}
               />
               <QuickActionCard
                 icon={<TrendingUp className="w-6 h-6" />}
-                label="View Report"
+                label={t("actions.viewReport")}
                 gradient="from-cyan-400 to-green-400"
                 delay={0.6}
               />
               <QuickActionCard
                 icon={<Users className="w-6 h-6" />}
-                label="Community"
+                label={t("actions.community")}
                 gradient="from-pink-400 to-purple-400"
                 delay={0.65}
               />
@@ -298,7 +301,7 @@ function QuickActionCard({
       transition={{ duration: 0.3, delay }}
       whileHover={{ scale: 1.05, y: -4 }}
       whileTap={{ scale: 0.95 }}
-      className={`rounded-2xl bg-gradient-to-br ${gradient} p-6 text-white shadow-lg hover:shadow-xl transition-shadow flex flex-col items-center gap-3`}
+      className={`rounded-2xl bg-gradient-to-br ${gradient} p-6 text-white shadow-lg hover:shadow-xl transition-shadow flex flex-col items-center gap-3 w-full`}
     >
       {icon}
       <span className="text-sm font-medium">{label}</span>
