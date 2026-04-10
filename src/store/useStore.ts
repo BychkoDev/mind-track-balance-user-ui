@@ -5,8 +5,7 @@ export interface UserProfile {
   uuid: string;
   login: string;
   email: string;
-  firstname?: string;
-  surname?: string;
+  fullName: string;
   avatarUrl?: string;
   active: boolean;
   vip: boolean;

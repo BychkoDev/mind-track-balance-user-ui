@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { signin, googleLoginService } from "./authService";
 import { fetchUserInfo } from "../(protected)/auth/fetchUserInfo";
 import { useStore } from "@/store/useStore";
@@ -75,6 +75,13 @@ export default function LoginPage() {
       if (res.err) {
         setError(res.err.error || "Google login failed");
         setIsLoading(false);
+        return;
+      }
+
+      if(res.ok) {
+        console.log("RES OK: !!!!!!!!!!!!!" + JSON.stringify(res.ok));
+        setUser(res.ok);
+        router.push("/dashboard");
         return;
       }
 
