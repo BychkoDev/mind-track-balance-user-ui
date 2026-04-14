@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/common/UserAvatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { logout } from "@/app/[locale]/(protected)/logout";
 import { useStore } from "@/store/useStore";
@@ -79,12 +79,14 @@ export function DashboardHeader() {
             {/* User menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  <Avatar className="w-9 h-9">
-                    <AvatarFallback className="bg-gradient-to-br from-purple-400 to-cyan-400 text-white font-bold uppercase">
-                      {(user?.fullName || user?.login || "ME").slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
+                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity outline-none">
+                  <UserAvatar 
+                    size="md" 
+                    avatarUrl={user?.avatarUrl} 
+                    name={user?.fullName} 
+                    email={user?.login || user?.email}
+                    className="w-9 h-9"
+                  />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent

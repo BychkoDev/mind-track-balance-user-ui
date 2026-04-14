@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Camera, Briefcase, Mail } from "lucide-react";
+import { Brain, MessageCircle, Camera, Briefcase, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function Footer() {
@@ -10,10 +10,10 @@ export function Footer() {
           {/* Logo and tagline */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-400 via-blue-400 to-teal-400 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <Brain className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl">MindTrack Balance</span>
+              <span className="text-xl font-semibold">MindTrack Balance</span>
             </div>
             <p className="text-gray-300 leading-relaxed max-w-md">
               {t('tagline')}

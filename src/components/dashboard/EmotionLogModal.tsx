@@ -5,10 +5,22 @@ import { X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { env } from "@/env";
+import { SendMetrics } from "@/app/[locale]/(protected)/dashboard/dashboardService";
+
+export type Metrics = {
+  mood: number;
+  stressLevel: number;
+  energy: number;
+  anxiety: number;
+  focus: number;
+  recoveryFeeling: number;
+  contexts?: string[];
+  description?: string;
+  tags: string[];
+};
 
 const metricKeys = ["mood", "stressLevel", "energy", "anxiety", "focus", "recoveryFeeling"] as const;
-const contextKeys = ["work", "study", "fatigue", "rest", "social", "exercise"] as const;
+const contextKeys = ["WORK", "STUDY", "FATIGUE", "REST", "SOCIAL", "EXERCISE"] as const;
 
 interface EmotionLogModalProps {
   isOpen: boolean;
@@ -52,52 +64,35 @@ export function EmotionLogModal({ isOpen, onClose }: EmotionLogModalProps) {
 
     setIsSaving(true);
     // ... rest of saving logic
-    try {
-      const BACK_SERVER_URL = env.NEXT_PUBLIC_SERVER_URL || "http://localhost:4090";
-      
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(";").shift();
-      };
-      
-      const token = getCookie("jwt_access_token");
+  
+    const response = await SendMetrics({
+      mood: metricValues.mood,
+            stressLevel: metricValues.stressLevel,
+            energy: metricValues.energy,
+            anxiety: metricValues.anxiety,
+            focus: metricValues.focus,
+            recoveryFeeling: metricValues.recoveryFeeling,
+            contexts:
+              selectedContexts.length > 0 ? selectedContexts : undefined,
+            description: description || undefined,
+    } as Metrics);
 
-      const response = await fetch(`${BACK_SERVER_URL}/api/v1/mind-track/entries`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          mood: metricValues.mood,
-          stressLevel: metricValues.stressLevel,
-          energy: metricValues.energy,
-          anxiety: metricValues.anxiety,
-          focus: metricValues.focus,
-          recoveryFeeling: metricValues.recoveryFeeling,
-          contexts: selectedContexts.length > 0 ? selectedContexts : undefined,
-          description: description || undefined,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to save entry");
-
-      toast.success("Entry saved successfully! ✨");
-      
+    if(response.err === null) {
       setMetricValues({});
       setSelectedContexts([]);
       setDescription("");
       setShowLowValueWarning(false);
       setAttemptedSave(false);
       onClose();
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error("Failed to save. Please try again.");
-    } finally {
+      toast.success("Entry saved successfully! ✨");
       setIsSaving(false);
+      return;
     }
+    console.error("Save error:", response.err);
+    toast.error("Failed to save. Please try again.");
+    setIsSaving(false);
   };
+  
 
   const hasAnyMetric = Object.keys(metricValues).length > 0;
 

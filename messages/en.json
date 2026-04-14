@@ -106,6 +106,101 @@
     "cookie": "Cookie Policy",
     "copyright": "© 2025 MindTrack Balance"
   },
+  "Settings": {
+    "title": "Your Settings",
+    "subtitle": "Personalize your focus, wellbeing, and privacy preferences.",
+    "account": {
+      "title": "Account & Profile",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "language": "Language",
+      "timezone": "Time Zone",
+      "changePassword": "Change Password",
+      "deleteAccount": "Delete Account"
+    },
+    "mind": {
+      "title": "Mind & Attention Preferences",
+      "mindfulPause": "Mindful Pause",
+      "mindfulPauseDesc": "Gentle reminders to breathe and reset",
+      "attentionTracking": "Attention Tracking",
+      "attentionTrackingDesc": "Monitor your focus patterns throughout the day",
+      "focusMode": "Focus Mode",
+      "focusModeDesc": "Block distractions during deep work",
+      "reminderFrequency": "Reminder Frequency",
+      "freq": {
+        "gentle": "Gentle (Every 2 hours)",
+        "moderate": "Moderate (Every hour)",
+        "frequent": "Frequent (Every 30 min)",
+        "off": "Off"
+      }
+    },
+    "notifications": {
+      "title": "Notifications & Reports",
+      "email": "Email Notifications",
+      "emailDesc": "Receive updates via email",
+      "push": "Push Notifications",
+      "pushDesc": "Browser push notifications for reminders",
+      "weekly": "Weekly Report",
+      "weeklyDesc": "Summary of your mindfulness journey",
+      "sendTest": "Send Test Email"
+    },
+    "privacy": {
+      "title": "Privacy & Data",
+      "analytics": "Analytics Opt-in",
+      "analyticsDesc": "Help us improve MindTrack Balance",
+      "export": "Export My Data",
+      "deleteAll": "Delete All Data",
+      "notice": "Your data is encrypted and stored securely. We never share your personal information with third parties."
+    },
+    "appearance": {
+      "title": "Theme & Personalization",
+      "theme": "App Theme",
+      "themeOptions": {
+        "light": "Light",
+        "dark": "Dark",
+        "mindful": "Mindful (Recommended)"
+      },
+      "accent": "Color Accent",
+      "accentOptions": {
+        "purple": "Purple Calm",
+        "blue": "Ocean Blue",
+        "green": "Forest Green",
+        "coral": "Sunset Coral"
+      },
+      "animations": "Animation Level",
+      "animOptions": {
+        "minimal": "Minimal",
+        "smooth": "Smooth",
+        "playful": "Playful"
+      },
+      "preview": "Preview",
+      "previewDesc": "Your theme creates a calm, balanced atmosphere for mindful work"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "googleFit": "Google Fit",
+      "appleHealth": "Apple Health",
+      "telegram": "Telegram Bot",
+      "notConnected": "Not connected",
+      "connected": "Connected",
+      "comingSoon": "Coming soon",
+      "connect": "Connect"
+    },
+    "stickyHeader": {
+      "unsavedChanges": "You have unsaved changes"
+    },
+    "resetDialog": {
+      "title": "Are you absolutely sure?",
+      "description": "This will revert all settings to the state they were in when the page loaded. This action cannot be undone."
+    },
+    "actions": {
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "reset": "Reset to Initial",
+      "cancel": "Cancel",
+      "confirmReset": "Yes, reset changes"
+    }
+  },
   "Auth": {
     "signIn": "Sign In",
     "createAccount": "Create Account",
@@ -167,12 +262,12 @@
       "great": "Great"
     },
     "contexts": {
-      "work": "Work",
-      "study": "Study",
-      "fatigue": "Fatigue",
-      "rest": "Rest",
-      "social": "Social",
-      "exercise": "Exercise"
+      "WORK": "Work",
+      "STUDY": "Study",
+      "FATIGUE": "Fatigue",
+      "REST": "Rest",
+      "SOCIAL": "Social",
+      "EXERCISE": "Exercise"
     },
     "contextLabel": "Context (optional)",
     "reflectionLabel": "Reflection (optional)",
@@ -182,5 +277,46 @@
     "confirmTitle": "Are you sure?",
     "confirmLowValues": "You left metrics at the lowest level. Does this reflect your real state right now?",
     "confirmAction": "Yes, save"
+  },
+  "Profile": {
+    "title": "My Profile",
+    "identity": {
+      "motto": "Taking small pauses to stay balanced.",
+      "memberSince": "Member since {date}",
+      "editProfile": "Edit Profile",
+      "shareProgress": "Share My Progress",
+      "downloadSummary": "Download Summary (PDF)"
+    },
+    "stats": {
+      "mood": "Mood Average",
+      "focus": "Focus Score",
+      "balance": "Balance Index",
+      "mostlyCalm": "Mostly calm",
+      "improvement": "✨ Your balance improved this month. Keep steady."
+    },
+    "achievements": {
+      "title": "Achievements",
+      "streak": "7 days of mindfulness streak",
+      "reflections": "Completed 10 reflection sessions",
+      "improvement": "Improved balance by 15% this month",
+      "focusMaster": "Focus master - 50 hours logged"
+    },
+    "reflections": {
+      "title": "Recent Reflections",
+      "viewAll": "View all reflections"
+    },
+    "timeline": {
+      "title": "Activity Timeline",
+      "focusMode": "Started focus mode",
+      "loggedEmotion": "Logged emotion: Calm",
+      "completedReflection": "Completed reflection",
+      "sharedReport": "Shared weekly report",
+      "timeAgo": "{time} ago"
+    },
+    "ai": {
+      "title": "AI Insight",
+      "insight": "You tend to lose focus on Fridays — consider a short reflection before work. Your calm periods are most stable after morning sessions.",
+      "generate": "Generate new insight"
+    }
   }
 }

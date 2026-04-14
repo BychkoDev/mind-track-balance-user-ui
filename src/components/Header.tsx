@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Heart, Menu } from "lucide-react";
+import { Brain, Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
@@ -19,10 +19,10 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-200 via-blue-200 to-mint-200 flex items-center justify-center">
-            <Heart className="w-5 h-5 text-purple-600" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <Brain className="w-6 h-6 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 bg-clip-text text-transparent font-bold">
+          <span className="text-gray-800 dark:text-white font-semibold text-lg">
             MindTrack Balance
           </span>
         </div>

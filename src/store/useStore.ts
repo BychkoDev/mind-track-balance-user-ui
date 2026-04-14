@@ -15,6 +15,7 @@ export interface UserProfile {
   role: "USER";
   locale: "EN" | "UK";
   gender: "MALE" | "FEMALE" | "OTHER";
+  createdAt?: string;
 }
 
 interface AppState {
