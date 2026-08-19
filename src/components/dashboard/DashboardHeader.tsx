@@ -20,7 +20,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { logout } from "@/app/[locale]/(protected)/logout";
 import { useStore } from "@/store/useStore";
 
+import { useTranslations } from "next-intl";
+
 export function DashboardHeader() {
+  const t = useTranslations("DashboardHeader");
   const clearUser = useStore((state) => state.logout);
   const user = useStore((state) => state.user);
 
@@ -48,25 +51,25 @@ export function DashboardHeader() {
               href="/dashboard"
               className="text-purple-600 dark:text-purple-400"
             >
-              Dashboard
+              {t("dashboard")}
+            </a>
+            <a
+              href="/attention"
+              className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            >
+              {t("attention")}
             </a>
             <a
               href="#"
               className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
             >
-              Insights
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-            >
-              Community
+              {t("community")}
             </a>
             <a
               href="/settings"
               className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
             >
-              Settings
+              {t("settings")}
             </a>
           </nav>
 
@@ -140,25 +143,25 @@ export function DashboardHeader() {
                     href="/dashboard"
                     className="text-purple-600 dark:text-purple-400 font-medium transition-colors"
                   >
-                    Dashboard
+                    {t("dashboard")}
                   </a>
                   <a
-                    href="#insights"
+                    href="/attention"
                     className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors"
                   >
-                    Insights
+                    {t("attention")}
                   </a>
                   <a
                     href="#community"
                     className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors"
                   >
-                    Community
+                    {t("community")}
                   </a>
                   <a
                     href="/settings"
                     className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors"
                   >
-                    Settings
+                    {t("settings")}
                   </a>
                 </nav>
 

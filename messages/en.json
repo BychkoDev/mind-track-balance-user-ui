@@ -12,11 +12,32 @@
   "DashboardHeader": {
     "dashboard": "Dashboard",
     "insights": "Insights",
+    "attention": "Attention",
     "community": "Community",
     "settings": "Settings",
     "profile": "Profile",
     "signOut": "Sign Out",
     "navigation": "Navigation"
+  },
+  "AttentionDashboard": {
+    "title": "Attention Insights",
+    "subtitle": "Manage how you spend your time online.",
+    "overview": "Overview",
+    "trackedTime": "Tracked Time",
+    "topDomains": "Top Domains",
+    "timelineTitle": "Weekly Timeline",
+    "loading": "Loading...",
+    "noData": "No data available yet.",
+    "rulesAndLimits": "Rules & Limits",
+    "loadingRules": "Loading rules...",
+    "noRules": "No custom rules configured. Track domains using the extension.",
+    "domain": "Domain",
+    "tracking": "Tracking",
+    "softPause": "Soft Pause",
+    "active": "Active",
+    "ignored": "Ignored",
+    "on": "On",
+    "off": "Off"
   },
   "Landing": {
     "title1": "Find balance between your",

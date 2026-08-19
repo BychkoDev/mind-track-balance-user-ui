@@ -1,12 +1,14 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { SetAccessToken } from "./auth/SetAccessToken";
-import { getJwtAccessToken } from "@/app/[locale]/(protected)/auth/token";
+import { cookies } from "next/headers";
+import { JWT_REFRESH_TOKEN } from "@/utils/cookiesName";
 
 export default async function Template(props: { children: ReactNode }) {
-  const accessTokenCookie = await getJwtAccessToken();
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get(JWT_REFRESH_TOKEN);
 
-  if (!accessTokenCookie) {
+  if (!refreshToken) {
     redirect("/login");
   }
 

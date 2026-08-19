@@ -22,6 +22,8 @@ export async function getJwtAccessToken(): Promise<string> {
   return await regenerateAccessToken(refreshToken.value);
 }
 
+import { setJwtAccessToken, setJwtRefreshToken } from "./setTokens";
+
 export async function getJwtAccessTokenNoRedirect(): Promise<string | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(JWT_ACCESS_TOKEN);
@@ -35,7 +37,7 @@ export async function getJwtAccessTokenNoRedirect(): Promise<string | null> {
   }
 
   const res = await fetch(
-    `${BACK_SERVER_URL}/api/v1/auth/update/access-token`,
+    `${BACK_SERVER_URL}/api/v1/auth/refresh`,
     {
       method: "POST",
       headers: {
@@ -46,37 +48,55 @@ export async function getJwtAccessTokenNoRedirect(): Promise<string | null> {
     },
   );
 
-  if (res.status === 200) {
+  if (res.status === 200 || res.status === 201) {
     const json = (await res.json()) as {
-      accessJwtToken: string;
-      refreshJwtToken: string;
+      accessToken: string;
+      refreshToken: string;
     };
-    return json.accessJwtToken;
+    await setJwtAccessToken(json.accessToken);
+    await setJwtRefreshToken(json.refreshToken);
+    return json.accessToken;
   }
 
   return null;
 }
 
-export async function regenerateAccessToken(refreshToken: string) {
-  const res = await fetch(
-    `${BACK_SERVER_URL}/api/v1/auth/update/access-token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refreshToken }),
-      cache: "no-store",
-    },
-  );
+let refreshTokenPromise: Promise<string> | null = null;
 
-  if (res.status === 200) {
-    const json = (await res.json()) as {
-      accessJwtToken: string;
-      refreshJwtToken: string;
-    };
-    return json.accessJwtToken;
+export async function regenerateAccessToken(refreshToken: string): Promise<string> {
+  if (refreshTokenPromise) {
+    return refreshTokenPromise;
   }
 
-  redirect("/login");
+  refreshTokenPromise = (async () => {
+    try {
+      const res = await fetch(
+        `${BACK_SERVER_URL}/api/v1/auth/refresh`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refreshToken }),
+          cache: "no-store",
+        },
+      );
+
+      if (res.status === 200 || res.status === 201) {
+        const json = (await res.json()) as {
+          accessToken: string;
+          refreshToken: string;
+        };
+        await setJwtAccessToken(json.accessToken);
+        await setJwtRefreshToken(json.refreshToken);
+        return json.accessToken;
+      }
+
+      redirect("/login");
+    } finally {
+      refreshTokenPromise = null;
+    }
+  })();
+
+  return refreshTokenPromise;
 }

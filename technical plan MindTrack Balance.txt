@@ -1,0 +1,333 @@
+Технічний план MindTrack Balance:
+1) Цінність та обсяг продукту
+Мета: допомогти користувачу керувати балансом “емоції ↔ увага” через щоденні короткі записи, аналітику й м’які інтервенції (затримки/фокус-режими), з перспективою соціальної підтримки (групи/чати) та добровільного самоконтролю (блокування доменів/апок).
+Версії:
+MVP (Web + розширення браузера + PWA): трекінг настрою/тексту, базова аналітика, лічильники часу в соцмережах, “паузи-тертя”, щотижневий звіт, білінг.
+Після MVP: React Native (iOS/Android), голосові нотатки, розширені правила фокусу/блокування, “Сократ-режим” (активне мислення), групи підтримки, сімейний/командний режим.
+2) Архітектура (запас на майбутнє)
+Підхід: модульна, подієво-орієнтована система зі слабким зв’язком між компонентами.
+Frontend Web (Next.js 15, App Router, PWA)
+UI-shell + модулі: Mood, Attention, Advice, Reports, Settings, Billing.
+Browser Extension (MV3)
+Легка логіка перехоплення доменів, локальна телеметрія, опційна синхронізація з бекендом.
+Mobile App (React Native) — після валідації MVP
+Ті ж доменні модулі; спільна API-контрактна схема.
+Backend (NestJS)
+Сервіси: Auth, Entries, Attention, Analytics, Advice, Rules, Reports, Billing, Social(пізніше).
+Data: PostgreSQL (OLTP) + S3-сумісне сховище для експортів/медіа; (пізніше) ClickHouse/BigQuery для аналітики.
+Черги/фон: Redis + BullMQ (аналіз тексту, побудова звітів, емейли/push).
+AI-шар: абстракція LLMProvider (OpenAI/локальні), NLPService (тональність/теми) — через інтерфейс, щоб легко міняти провайдера.
+Події: EventBus (внутрішні доменні події: EntryCreated, AttentionEventLogged, ReportReady), для реактивних фіч.
+Feature Flags: ConfigCat/Unleash — включати майбутні модулі без релізу нових версій.
+3) Доменна модель (із запасом)
+User(id, email, locale, plan, deleted_at?)
+Profile(user_id, nickname, avatar?, timezone, onboarding_state)
+Entry(id, user_id, ts, mood[1..5], text, topics[], sentiment{valence, arousal}, source{web|mobile|api}, privacy{private|group_anonymous})
+Attachment(id, entry_id, type{text|audioTranscript|file}, uri)
+AttentionEvent(id, user_id, ts, source{extension|mobile}, target{domain|app}, action{open|bypass|blocked}, duration_s?)
+AttentionRule(id, user_id, kind{delay|limit|window|block}, target{domain|app}, params{seconds, quota, windows[]}, enabled)
+Advice(id, user_id, period{week}, summary, tips[])
+Report(id, user_id, period, type{weekly|pdf}, status{queued|ready}, uri)
+Subscription(user_id, plan, stripe_customer_id, renew_at, canceled_at?)
+Quota(user_id, month, llm_calls, audio_minutes)
+Group(id, name, type{challenge|support}, visibility{invite|code}, owner_id)
+GroupMember(group_id, user_id, role{owner|mod|member}, joined_at)
+Post(id, group_id, user_id, ts, kind{checkin|note|milestone}, text, reactions_count)
+AuditLog(id, user_id, action, meta, ts)
+Consent(user_id, key{data_sync|email|ext_sync}, value{granted|revoked}, ts)
+Примітки для розширення:
+– AttentionRule дозволяє з часом додати батьківський/груповий контроль (через owner_id/політики).
+– Group*/Post готують ґрунт для міні-спільнот.
+– Consent — явні згоди, щоб змінювати політики без переробки БД.
+4) Публічне API (стабільний контракт)
+POST /auth/signup|signin|signout
+GET /me (профіль + план + квоти)
+POST /entries, GET /entries?from&to, DELETE /entries/:id
+POST /attention/events(bulk), GET /attention/summary?range
+GET /advice/weekly?week
+POST /rules, GET /rules, PATCH /rules/:id, DELETE /rules/:id
+POST /reports/weekly/queue, GET /reports/:id
+POST /billing/checkout, GET /billing/portal
+(пізніше) POST /groups, POST /groups/:id/join, POST /posts
+Внутрішнє (service-to-service): події в Redis Streams/Queue, без розголосу назовні.
+5) MVP Web — вимоги та backlog
+Функціонал MVP
+Щоденний запис
+Mood(1–5) + 140 символів.
+AI-аналіз (тон/теми) у фоні.
+Історія + фільтри за темами.
+PWA: офлайн-кеш, синх при онлайні.
+Відстеження уваги
+Розширення MV3: перехоплення відкриття tiktok|instagram|youtube|facebook|reddit (список з Settings).
+5–10 сек “затримка” із кнопкою “обійти” + лог події.
+Збір метрик локально; за згодою — синх у бекенд.
+Дашборд
+Графік настрою (лінія), хвилини/день (стовпчики), простий інсайт: зв’язок у % між днями з >Х хв скролу й середнім настроєм.
+Щотижневий звіт
+Автогенерація неділя 19:00 (таймзона профілю).
+Емейл + у додатку: 3 інсайти, 1–2 поради.
+Білінг (Freemium → Pro)
+Stripe Checkout + Customer Portal.
+Free: 30-денна історія, 1 правило “затримки”, базові графіки.
+Pro: повна історія, кілька правил, PDF-звіт, розширені інсайти.
+Приватність
+Явні Consent.
+Видалення акаунта (GDPR-style).
+Експорт даних (JSON/CSV).
+Нефункціональні
+Латентність UI: <150–200 мс на збереження Entry.
+Надійність фон-джоб: при падінні процесу черга відновлює задачі.
+Облік квот LLM: захист від надмірних витрат.
+i18n: uk/en з day-1.
+Observability: HTTP-логування, трасування ключових потоків (sign-in, create entry, gen report), метрики черг.
+Backlog (скорочено, 20 задач)
+FE: EntryForm, EntryList, Dashboard, Settings, Reports, Billing pages, PWA (service worker).
+BE: entries.service, attention.service, nlp.worker, reports.worker, billing.webhooks.
+EXT: onBeforeNavigate + DelayOverlay, локальний Storage, батч-синхронізація.
+QA: unit на nlp.mapper, інтеграційні на entries, e2e “create-analyze-report”.
+6) Після MVP — еволюція без переробок
+A) React Native (4–6 тижнів)
+Екрани 1:1 з Web.
+Нативні push’і (ранок/вечір/тижневий).
+Голосові нотатки → локальна транскрипція (за можливості) або серверна; зберігання як Attachment.
+Вбудований WebView з “м’яким фокус-режимом” для популярних сайтів.
+B) Розширені правила уваги
+AttentionRule.kind=limit|window|block + windows[] (cron-подібні).
+“Focus Mode” (добровільне замикання на N часу) + відкладене відкриття.
+Сімейний/наставницький доступ (агреговані метрики, без контенту).
+C) “Сократ-режим” (активне мислення)
+Перед відповіддю AI користувач пише коротку власну версію → AI порівнює та дає підсвітки, не “готове рішення”.
+Облік як Advice + мікро-квести.
+D) Групи підтримки
+Group, GroupMember, Post (анонімні ніки).
+Реакції “підтримати” замість лайків.
+Soft AI-модерація токсичних патернів.
+Челенджі 7/14 днів (серії, бейджі).
+E) Аналітика/Дані
+Перенесення агрегацій у ClickHouse/BigQuery для звітів без навантаження на Postgres.
+Паблік-дашборд анонімної статистики.
+7) Безпека, приватність, етика
+Data-minimization: збираємо лише події/час/домени/апки — без вмісту сторінок.
+Opt-in: відстеження уваги та синхронізація — лише за згодою.
+Reversible controls: будь-яке блокування/затримка вимикається користувачем (зарезервовано для батьківського режиму з окремою згодою).
+Видимість для груп/сім’ї: лише агрегати (хвилини, серії), нуль приватних текстів.
+Шифрування: у спокої (PGP-ат-rest/SSE-S3), у транзиті (TLS), ключі в Secret Manager.
+Логи: без PII у прод-логах.
+8) Тестування та реліз
+Unit: мапери NLP, обчислення інсайтів, правила уваги.
+Integration: API entries, attention, Stripe-webhook.
+E2E (Playwright): створення запису → аналітика → звіт → білінг.
+Extension QA: сценарії “блок”, “затримка”, “обхід”, збій мережі, повторна синхронізація.
+Canary-релізи через feature flags, поступове вмикання розширених правил.
+9) Монетизація (вбудовано в технічну реалізацію)
+План Free/Pro/Duo/Teams у Subscription.
+Квоти LLM/аудіо в Quota; сторінка upsell при вичерпанні.
+Stripe Customer Portal для самостійного керування підпискою.
+In-app покупки для “мікро-квестів” (контент-паки).
+10) UX-орієнтири (щоб уникнути переробок)
+Design tokens (кольори/шрифти/spacing) у одному місці; тема світла/темна з day-1.
+Form schemas через Zod — одна схема і для FE, і для BE (типобезпечність).
+Компонентний підхід: графіки/картки/модалки як бібліотека.
+Інструментальні пороги: усе, що може бути параметром (поріг хвилин, довжина затримки, список доменів), — у Rules, а не в коді.
+Підсумок
+MVP концентрується на трьох ядрах: записи емоцій, базова аналітика “емоції ↔ увага”, м’які інтервенції (затримки) + щотижневий звіт і білінг.
+Архітектура одразу готує місце під мобільний застосунок, розширені правила фокусу, групи підтримки, голосові нотатки, Сократ-режим — без ламання контрактів/схеми даних.
+Усе критично чутливе (AI-провайдер, аналітика, правила) — зашито через інтерфейси, фічефлаги і таблиці конфігурацій, тож майбутні зміни не потребуватимуть переписування.
+Також ми вирішили, що все ж таки це буде на базі вже певних моїх нароботок і проєкт буде
+Мікросервісна архітектура 5 модулів:
+auth, users, mind-track, attention, public.
+І це все буде моно репозиторій.
+Також розробили певну структуру вже:
+Структура - схеми даних — ядро
+- users (сервіс Users):
+Зберігає профіль і налаштування.
+// schema.prisma (users)
+model User {
+id String @id @default(uuid())
+email String @unique
+createdAt DateTime @default(now())
+// auth-зв'язок по sub/JWT поза цією схемою
+profile Profile?
+settings Settings?
+}
+model Profile {
+userId String @id
+user User @relation(fields: [userId], references: [id])
+nickname String?
+avatarUrl String?
+timezone String @default("Europe/Kyiv")
+locale String @default("uk")
+}
+enum PrivacyLevel { PRIVATE ANONYMIZED SHARE_STATS }
+model Settings {
+userId String @id
+user User @relation(fields: [userId], references: [id])
+privacyLevel PrivacyLevel @default(PRIVATE)
+weeklyReportHour Int @default(19) // 19:00 local
+emailReports Boolean @default(true)
+consentDataSync Boolean @default(false) // синхронизація з розширення/мобіли
+consentExtSync Boolean @default(false) // надсилати події attention на бек
+deletedAt DateTime?
+}
+- mindtrack (сервіс MindTrack)
+Записи настрою, аналітика, поради, звіти, підписка + квоти, outbox для подій.
+// schema.prisma (mindtrack)
+model Entry {
+id String @id @default(uuid())
+userId String @index
+ts DateTime @default(now())
+mood Int // 1..5
+text String? @db.VarChar(500)
+lang String? // "uk" | "en"
+source Source @default(WEB)
+nlp EntryNlp?
+}
+enum Source { WEB MOBILE API }
+model EntryNlp {
+entryId String @id
+entry Entry @relation(fields: [entryId], references: [id])
+valence Float? // -1..1 умовно
+arousal Float? // 0..1
+topics String[] // масив тегів
+}
+model Advice {
+id String @id @default(uuid())
+userId String @index
+weekIso Int // ISO week number YYYYWW (напр., 202543)
+summary String?
+tips Json? // масив коротких порад
+createdAt DateTime @default(now())
+@@unique([userId, weekIso])
+}
+enum ReportType { WEEKLY PDF }
+enum ReportStatus { QUEUED READY ERROR }
+model Report {
+id String @id @default(uuid())
+userId String @index
+periodFrom DateTime
+periodTo DateTime
+type ReportType
+status ReportStatus @default(QUEUED)
+uri String? // посилання на S3/MinIO
+createdAt DateTime @default(now())
+}
+enum Plan { FREE PRO DUO TEAM }
+model Subscription {
+userId String @id
+plan Plan @default(FREE)
+renewAt DateTime?
+stripeCustomerId String?
+canceledAt DateTime?
+}
+model Quota {
+userId String
+month DateTime // перший день місяця
+llmCalls Int @default(0)
+audioMinutes Int @default(0)
+@@id([userId, month])
+}
+model Outbox {
+id String @id @default(uuid())
+topic String // e.g., "entries.created.v1"
+payload Json
+status String @default("new")
+createdAt DateTime @default(now())
+}
+model ProcessedMessage {
+id String @id
+processedAt DateTime @default(now())
+}
+- attention (сервіс Attention)
+Івенти з розширення/мобіли й правила “затримка/ліміт/вікна/блок”.
+// schema.prisma (attention)
+enum EventSource { EXTENSION MOBILE }
+enum TargetType { DOMAIN APP }
+enum EventAction { OPEN BYPASS BLOCKED }
+model AttentionEvent {
+id String @id @default(uuid())
+userId String @index
+ts DateTime @default(now())
+source EventSource
+targetType TargetType
+targetId String // youtube.com або com.tiktok.app
+action EventAction
+durationSec Int? // якщо відомо
+}
+enum RuleKind { DELAY LIMIT WINDOW BLOCK }
+model AttentionRule {
+id String @id @default(uuid())
+userId String @index
+kind RuleKind
+targetType TargetType
+targetId String // шаблон домену/апки
+params Json // {seconds, quotaPerDay, windows: [{from,to}], …}
+enabled Boolean @default(true)
+createdAt DateTime @default(now())
+}
+model RuleUsage {
+id String @id @default(uuid())
+ruleId String @index
+userId String @index
+ts DateTime @default(now())
+matched Boolean @default(true)
+bypassed Boolean @default(false)
+}
+admin (тонка адмінка, можна окремим модулем у mindtrack або окремим сервісом)
+Контентно-конфігураційний шар. Усі поля — нечутливі, без доступу до користувацького вмісту.
+// schema.prisma (mindtrack admin block)
+model PromptTemplate {
+id String @id @default(uuid())
+key String @unique // e.g., "weekly_summary_v1"
+locale String @default("uk")
+version Int @default(1)
+content String // markdown / handlebars
+metadata Json?
+isActive Boolean @default(true)
+updatedAt DateTime @updatedAt
+}
+model FeatureFlag {
+key String @id // e.g., "socratic_mode"
+isEnabled Boolean @default(false)
+rollout Int? // 0..100
+payload Json?
+updatedAt DateTime @updatedAt
+}
+model StaticPage {
+id String @id @default(uuid())
+slug String @unique // "about", "privacy", "terms"
+locale String @default("uk")
+title String
+contentMd String
+published Boolean @default(true)
+version Int @default(1)
+updatedAt DateTime @updatedAt
+}
+model AdminAudit {
+id String @id @default(uuid())
+actorId String // id superadmin-а (з твого auth)
+action String
+meta Json?
+ts DateTime @default(now())
+}
+Ролі та доступ
+JWT з role і plan приходить із твого auth.
+Продукт: role = "user" — весь звичайний функціонал.
+Адмінка: тільки role = "superadmin" (allowlist емейлів/IDs на бекенді).
+Немає жодних ендпоінтів, що повертають контент користувача в адмінку.
+Ендпоінти (мінімальний зріз)
+mindtrack
+POST /entries | GET /entries?from&to
+GET /analytics/weekly (агрегати + зв’язок mood↔attention)
+POST /reports/weekly/queue | GET /reports/:id
+GET /advice/weekly?week=
+GET /subscription | POST /billing/checkout | POST /billing/webhook
+attention
+POST /ingest/events (bulk)
+GET /summary?from&to
+GET /rules | POST /rules | PATCH /rules/:id | DELETE /rules/:id
+(за потреби) POST /evaluate — відповідає, що робити зараз (delay/allow/block)
+admin (лише superadmin)
+GET/PUT /admin/prompts/:key
+GET/PUT /admin/flags/:key
+GET/PUT /admin/pages/:slug
+GET /admin/health (стан воркерів/черг без user-data)
