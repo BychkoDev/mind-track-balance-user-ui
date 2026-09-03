@@ -13,6 +13,7 @@ import { fetchUserInfo } from "../(protected)/auth/fetchUserInfo";
 import { useStore } from "@/store/useStore";
 import { useTranslations } from "next-intl";
 import { CustomGoogleButton } from "@/components/ui/CustomGoogleButton";
+import { Link } from "@/i18n/routing";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -293,7 +295,30 @@ export default function LoginPage() {
                     />
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 rounded-2xl py-6 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/40 transition-all font-semibold">
+                  <div className="flex items-start space-x-3 mt-4">
+                    <input
+                      type="checkbox"
+                      id="acceptTerms"
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                      className="mt-1 w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <Label htmlFor="acceptTerms" className="text-sm text-gray-600 dark:text-gray-400 leading-tight">
+                      {t("acceptTermsPrefix")}{" "}
+                      <Link href="/terms" className="text-purple-600 hover:text-purple-700 transition-colors">
+                        {t("termsLink")}
+                      </Link>{" "}
+                      {t("and")}{" "}
+                      <Link href="/privacy" className="text-purple-600 hover:text-purple-700 transition-colors">
+                        {t("privacyLink")}
+                      </Link>
+                    </Label>
+                  </div>
+
+                  <Button 
+                    disabled={!acceptTerms}
+                    className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 rounded-2xl py-6 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/40 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale"
+                  >
                     {t("createAccount")}
                   </Button>
                 </TabsContent>
@@ -321,12 +346,19 @@ export default function LoginPage() {
               <div className="mt-6 text-center">
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   {t("privacyNotice")}{" "}
-                  <a
-                    href="#"
+                  <Link
+                    href="/terms"
                     className="text-purple-600 hover:text-purple-700 transition-colors"
                   >
-                    {t("privacyPolicy")}
-                  </a>
+                    {t("termsLink")}
+                  </Link>{" "}
+                  {t("and")}{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-purple-600 hover:text-purple-700 transition-colors"
+                  >
+                    {t("privacyLink")}
+                  </Link>
                 </p>
               </div>
             </div>

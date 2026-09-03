@@ -6,6 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 
 export function Header() {
   const t = useTranslations("Header");
@@ -28,18 +29,18 @@ export function Header() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+          <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
             {t('about')}
-          </a>
-          <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+          </Link>
+          <Link href="/features" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
             {t('features')}
-          </a>
-          <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+          </Link>
+          <Link href="/prices" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
             {t('pricing')}
-          </a>
-          <a href="/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+          </Link>
+          <Link href="/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
             {t('signIn')}
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-4">
@@ -71,18 +72,18 @@ export function Header() {
 
               {/* Навігація з відступом зліва (px-8) та нижнім бордером */}
               <nav className="flex flex-col gap-6 text-lg mt-8 px-8 pb-8 border-b border-gray-100 dark:border-slate-800">
-                <a href="#about" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
+                <Link href="/about" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
                   {t('about')}
-                </a>
-                <a href="#features" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
+                </Link>
+                <Link href="/features" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
                   {t('features')}
-                </a>
-                <a href="#pricing" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
+                </Link>
+                <Link href="/prices" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
                   {t('pricing')}
-                </a>
-                <a href="/login" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
+                </Link>
+                <Link href="/login" className="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-600 transition-colors">
                   {t('signIn')}
-                </a>
+                </Link>
               </nav>
               
               {/* Нижня частина з Appearance, Language та кнопкою Start Free */}

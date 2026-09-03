@@ -236,7 +236,56 @@
     "welcomeDesc": "A safe place for self-reflection and digital balance",
     "signInWithGoogle": "Sign in with Google",
     "signingIn": "Signing in...",
-    "creatingAccount": "Creating account..."
+    "creatingAccount": "Creating account...",
+    "acceptTermsPrefix": "I agree to the",
+    "termsLink": "Terms of Service",
+    "and": "and",
+    "privacyLink": "Privacy Policy"
+  },
+  "About": {
+    "title": "About MindTrack Balance",
+    "content": "MindTrack Balance is a digital wellbeing platform designed to help you build healthier habits with technology. Our mission is to empower individuals to reclaim their time and attention in an increasingly distracting world.\n\nWe believe that technology should serve you, not control you. By providing tools for emotion tracking, mindful pauses, and attention management, we help you find the sweet spot between productivity and peace of mind.\n\nOur team consists of developers, designers, and psychology enthusiasts who are passionate about humane technology."
+  },
+  "Prices": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the plan that fits your mindfulness journey.",
+    "freePlan": "Basic Balance",
+    "month": "mo",
+    "freeFeature1": "Basic emotion tracking",
+    "freeFeature2": "Standard attention limits",
+    "currentPlan": "Your Current Plan",
+    "proBadge": "Most Popular",
+    "proPlan": "Pro Balance",
+    "proFeature1": "Advanced AI insights",
+    "proFeature2": "Unlimited custom rules",
+    "proFeature3": "Priority support & community access",
+    "upgradePro": "Upgrade to Pro"
+  },
+  "Privacy": {
+    "title": "Privacy Policy",
+    "content": "Your privacy is our highest priority at MindTrack Balance.\n\n1. Data Collection\nWe only collect data that is strictly necessary to provide you with insights into your digital habits. This includes the domains you visit and the time spent on them, but only if you explicitly choose to track them.\n\n2. Data Security\nYour emotional reflections and browsing data are securely encrypted. We do not sell your personal data to third parties, advertisers, or data brokers.\n\n3. Your Control\nYou have complete control over your data. You can export or delete your account and all associated data at any time from your settings page."
+  },
+  "Terms": {
+    "title": "Terms of Service",
+    "content": "Welcome to MindTrack Balance.\n\n1. Acceptance of Terms\nBy creating an account and using our services, you agree to comply with these terms.\n\n2. Use of Service\nYou agree to use the service only for personal wellbeing and productivity. You must not abuse the API or attempt to circumvent the extension's limitations in malicious ways.\n\n3. Limitation of Liability\nMindTrack Balance is provided 'as is'. We are not responsible for any direct or indirect consequences resulting from your use of the application, including missed deadlines or emotional distress.\n\n4. Changes to Terms\nWe reserve the right to modify these terms. Continued use of the platform indicates acceptance of any new terms."
+  },
+  "Features": {
+    "heroTitle": "Tools for Your Digital Peace",
+    "heroSubtitle": "Everything you need to regain control of your time, understand your emotions, and work more productively.",
+    "f1_title": "Emotion Tracking",
+    "f1_desc": "Regularly log your mood, stress, and energy levels to understand how your digital habits affect your well-being.",
+    "f2_title": "Mindful Pause",
+    "f2_desc": "A 5-second delay before opening distracting sites. Gives you a chance to ask: \"Do I really want to go here?\" and stops mindless scrolling.",
+    "f3_title": "Hard Limits",
+    "f3_desc": "Set daily limits on specific sites (e.g., 30 mins on YouTube). When the time is up, the site is strictly blocked.",
+    "f4_title": "AI Insights",
+    "f4_desc": "Smart analysis of your patterns (e.g., \"You often lose focus on Friday evenings, try taking a break\").",
+    "f5_title": "Weekly Analytics",
+    "f5_desc": "Trend charts showing how your anxiety, calm, and productivity levels change throughout the week.",
+    "f6_title": "Community",
+    "f6_desc": "A safe space for check-ins, sharing insights, and support among people who also seek digital detox.",
+    "ctaTitle": "Ready to change your digital habits?",
+    "ctaButtonPrimary": "Start for Free"
   },
   "Dashboard": {
     "welcome": "Welcome back, {name}",
